@@ -1,4 +1,12 @@
 """
+    import numpy and minimize solver
+    can install with:
+    python -m pip install numpy scipy
+"""
+import numpy as np
+from scipy.optimize import minimize
+
+"""
 Constants
     B - budget
     N - number of food items under analysis
@@ -123,21 +131,26 @@ g6 = lambda X: NC[1] - sum(X[i] * AC[i] for i in range(0, N))
 g7 = lambda X: NF[1] - sum(X[i] * AF[i] for i in range(0, N))
 
 """
+    Set Up for SciPy Solver
+    * May want to comment if using "Playground" below
+"""
+x0 = [0 for i in range(0, N)]
+b = [0, None]
+bs = [b for i in range(0, N)]
+con1 = {'type': 'ineq', 'fun': g1}
+con2 = {'type': 'ineq', 'fun': g2}
+con3 = {'type': 'ineq', 'fun': g3}
+con4 = {'type': 'ineq', 'fun': g4}
+con5 = {'type': 'ineq', 'fun': g5}
+con6 = {'type': 'ineq', 'fun': g6}
+con7 = {'type': 'ineq', 'fun': g7}
+cons = [con1, con2, con3, con4, con5, con6, con7]
+solution = minimize(f, x0, bounds=bs, constraints=cons)
+print(solution)
+
+"""
 Playground
 """
-X = (
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    1,
-)
 
 # Define the 11-dimentional design variable
 # e.g. let's see what happens if we only eat an egg for a meal
@@ -169,3 +182,5 @@ print(g2(X), g3(X), g4(X)) # (-21.33, -74, -9.67) - looks like we're not gonna h
 
 # Nutritional constraints - upper bounds (this is optional)
 print(g5(X), g6(X), g7(X)) # (39.33, 107.33, 21) - well at least we're not gonna consume too much of anything
+
+
