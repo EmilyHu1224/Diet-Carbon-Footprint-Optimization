@@ -1,6 +1,6 @@
 """
-    import numpy and minimize solver
-    can install with:
+Import numpy and minimize solver
+    install with:
     python -m pip install numpy scipy
 """
 import numpy as np
@@ -19,11 +19,15 @@ Constants
     AC - amount of carbohydrates of food items (AP1, AP2, ..., APn)
     AF - amount of fat of food items (AP1, AP2, ..., APn)
 """
-B = 5
+# B = 5
+B = 15
 N = 11
-NP = (27.33, 45.33)
-NC = (75, 108.33)
-NF = (14.67, 26)
+# NP = (27.33, 45.33)
+# NC = (75, 108.33)
+# NF = (14.67, 26)
+NP = (82, 136)
+NC = (225, 325)
+NF = (44, 78)
 Y = (
     0.0826,
     0.0522,
@@ -131,8 +135,7 @@ g6 = lambda X: NC[1] - sum(X[i] * AC[i] for i in range(0, N))
 g7 = lambda X: NF[1] - sum(X[i] * AF[i] for i in range(0, N))
 
 """
-    Set Up for SciPy Solver
-    * May want to comment if using "Playground" below
+SciPy Solver
 """
 x0 = [0 for i in range(0, N)]
 b = [0, None]
@@ -151,36 +154,36 @@ print(solution)
 """
 Playground
 """
+def playground():
+    # Define the 11-dimentional design variable
+    # e.g. let's see what happens if we only eat an egg for a meal
+    X = (
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+    )
 
-# Define the 11-dimentional design variable
-# e.g. let's see what happens if we only eat an egg for a meal
-X = (
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    1,
-)
+    # Compute & print the corresponding objective function value
+    print(f(X)) # 0.225 - hey that's a pretty low carbon footprint!
 
-# Compute & print the corresponding objective function value
-print(f(X)) # 0.225 - hey that's a pretty low carbon footprint!
+    # Compute & print the corresponding constraint values
+    # (g >= 0 means the constraint is met)
 
-# Compute & print the corresponding constraint values
-# (g >= 0 means the constraint is met)
+    # Budget constraint
+    print(g1(X)) # 4.712 - aaaand it's within our budget :D
 
-# Budget constraint
-print(g1(X)) # 4.712 - aaaand it's within our budget :D
+    # Nutritional constraints - lower bounds
+    print(g2(X), g3(X), g4(X)) # (-21.33, -74, -9.67) - looks like we're not gonna have enough of any of the macronutrient tho:(
 
-# Nutritional constraints - lower bounds
-print(g2(X), g3(X), g4(X)) # (-21.33, -74, -9.67) - looks like we're not gonna have enough of any of the macronutrient tho:(
+    # Nutritional constraints - upper bounds (this is optional)
+    print(g5(X), g6(X), g7(X)) # (39.33, 107.33, 21) - well at least we're not gonna consume too much of anything
 
-# Nutritional constraints - upper bounds (this is optional)
-print(g5(X), g6(X), g7(X)) # (39.33, 107.33, 21) - well at least we're not gonna consume too much of anything
-
-
+# playground()
