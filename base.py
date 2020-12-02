@@ -1,13 +1,4 @@
 """
-Import numpy and minimize solver
-    install with:
-    python -m pip install numpy scipy
-"""
-import numpy as np
-from scipy.optimize import minimize
-from scipy.optimize import linprog
-
-"""
 Constants
     B - budget
     N - number of food items under analysis
@@ -92,6 +83,8 @@ AF = (
     10,
     5,
 )
+X_MAX = 3
+
 
 """
 Objective function
@@ -132,23 +125,6 @@ g6 = lambda X: NC[1] - sum(X[i] * AC[i] for i in range(0, N))
 g7 = lambda X: NF[1] - sum(X[i] * AF[i] for i in range(0, N))
 
 """
-SciPy Solver
-"""
-x0 = [0 for i in range(0, N)]
-b = [0, None]
-bs = [b for i in range(0, N)]
-con1 = {'type': 'ineq', 'fun': g1}
-con2 = {'type': 'ineq', 'fun': g2}
-con3 = {'type': 'ineq', 'fun': g3}
-con4 = {'type': 'ineq', 'fun': g4}
-con5 = {'type': 'ineq', 'fun': g5}
-con6 = {'type': 'ineq', 'fun': g6}
-con7 = {'type': 'ineq', 'fun': g7}
-cons = [con1, con2, con3, con4, con5, con6, con7]
-solution = minimize(f, x0, bounds=bs, constraints=cons)
-#print(solution)
-
-"""
 Test
     X - the 11-dimentional design variable
 """
@@ -169,16 +145,13 @@ def test(X):
     print(g5(X), g6(X), g7(X))
 
 """
-Scipy Linear Programming
+Negate each element of an array
 """
+neg = lambda arr: [-a for a in arr]
 
-c = np.array(Y)
-neg_AP = [element * -1 for element in AP]
-neg_AC = [element * -1 for element in AC]
-neg_AF = [element * -1 for element in AF]
-A_ub = np.array([C, neg_AP, neg_AC, neg_AF, AP, AC, AF])
-b_ub = np.array([B, -NP[0], -NC[0], -NF[0], NP[1], NC[1], NF[1]])
-bounds = [(0, 3) for i in range(0, N)]
-res = linprog(c=c, A_ub=A_ub, b_ub=b_ub, bounds=bounds, method='simplex')
-print(res)
-print(test(res.x))
+"""
+Print each element of an array
+"""
+def print_arr(arr):
+    for a in arr:
+        print(round(a, 3))

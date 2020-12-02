@@ -4,6 +4,11 @@
 3. Constraints (g1,g2, ..., g4)
 4. Optioonal constraints - the upper bound of nutritional values (g5, g6, g7)
 
+Install the dependencies with:
+```
+python -m pip install numpy scipy
+```
+
 Example usage:
 ```
 # Define the 11-dimentional design variable
