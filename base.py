@@ -11,8 +11,8 @@ Constants
     AC - amount of carbohydrates of food items (AP1, AP2, ..., APn)
     AF - amount of fat of food items (AP1, AP2, ..., APn)
 """
-B = 15
-N = 11
+B = 10
+N = 18
 NP = (82, 136)
 NC = (225, 325)
 NF = (44, 78)
@@ -20,7 +20,13 @@ Y = (
     0.0826,
     0.0522,
     0.0624,
+    0.081,
+    0.02121,
+    0.0736,
+    0.1722,
     0.774,
+    0.0165,
+    0.0605,
     1.05,
     0.139,
     0.049,
@@ -28,12 +34,19 @@ Y = (
     0.45,
     4.5,
     0.225,
+    0.474,
 )
 C = (
     0.205,
     0.574,
     0.452,
+    0.20,
+    0.75,
+    0.352,
+    0.246,
     0.648,
+    0.0315,
+    0.0547,
     0.634,
     0.540,
     0.2023,
@@ -41,12 +54,19 @@ C = (
     0.996,
     1.135,
     0.288,
+    1.06,
 )
 AP = (
     1,
     0,
     3,
+    4,
+    2,
+    1,
+    1,
     9,
+    0,
+    0,
     12,
     7,
     3,
@@ -54,13 +74,19 @@ AP = (
     19,
     26,
     6,
+    21,
 )
-
 AC = (
     27,
     19,
     34,
+    11,
+    9,
+    1,
+    5,
     12,
+    0,
+    0,
     1,
     4,
     18,
@@ -68,13 +94,19 @@ AC = (
     0,
     0,
     1,
+    3,
 )
-
 AF = (
     0,
     0,
     0,
+    0,
+    15,
+    0,
+    0,    
     5,
+    4,
+    4,
     17,
     4,
     0,
@@ -82,9 +114,31 @@ AF = (
     7,
     10,
     5,
+    11,
 )
+X_MIN = 0
 X_MAX = 3
 
+NAMES = (
+    'Banana',
+    "Apples",
+    'Potato',
+    'Peas',
+    'Avocado',
+    'Spinach',
+    'Tomatoes',
+    'Milk',
+    'Margarine',
+    'Butter',
+    'Cheese',
+    'Soymilk',
+    'Bread',
+    'White Rice',
+    'Chicken',
+    'Beef',
+    'Eggs',
+    'Tofu',
+)
 
 """
 Objective function
@@ -153,5 +207,5 @@ neg = lambda arr: [-a for a in arr]
 Print each element of an array
 """
 def print_arr(arr):
-    for a in arr:
-        print(round(a, 3))
+    for i in range(0, len(arr)):
+        print('#{} {}: {}'.format(str(i+1).zfill(2), NAMES[i], round(arr[i], 3)))

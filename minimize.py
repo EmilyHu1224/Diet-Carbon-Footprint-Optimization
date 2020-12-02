@@ -5,7 +5,7 @@ from base import *
 from scipy.optimize import minimize
 
 x0 = [0 for i in range(0, N)]
-bounds = [[0, X_MAX] for i in range(0, N)]
+bounds = [[X_MIN, X_MAX] for i in range(0, N)]
 con1 = {'type': 'ineq', 'fun': g1}
 con2 = {'type': 'ineq', 'fun': g2}
 con3 = {'type': 'ineq', 'fun': g3}
