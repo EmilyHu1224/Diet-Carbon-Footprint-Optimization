@@ -1,13 +1,4 @@
 """
-Import numpy and minimize solver
-    install with:
-    python -m pip install numpy scipy
-"""
-import numpy as np
-from scipy.optimize import minimize
-from scipy.optimize import linprog
-
-"""
 Constants
     B - budget
     N - number of food items under analysis
@@ -20,11 +11,10 @@ Constants
     AC - amount of carbohydrates of food items (AP1, AP2, ..., APn)
     AF - amount of fat of food items (AP1, AP2, ..., APn)
 """
-B = 15
-N = 11
-NP = (82, 136)
-NC = (225, 325)
-NF = (44, 78)
+B = 5
+NP = (27.33, 45.33)
+NC = (75, 108.33)
+NF = (14.67, 26)
 Y = (
     0.0826,
     0.0522,
@@ -131,54 +121,42 @@ g5 = lambda X: NP[1] - sum(X[i] * AP[i] for i in range(0, N))
 g6 = lambda X: NC[1] - sum(X[i] * AC[i] for i in range(0, N))
 g7 = lambda X: NF[1] - sum(X[i] * AF[i] for i in range(0, N))
 
-"""
-SciPy Solver
-"""
-x0 = [0 for i in range(0, N)]
-b = [0, None]
-bs = [b for i in range(0, N)]
-con1 = {'type': 'ineq', 'fun': g1}
-con2 = {'type': 'ineq', 'fun': g2}
-con3 = {'type': 'ineq', 'fun': g3}
-con4 = {'type': 'ineq', 'fun': g4}
-con5 = {'type': 'ineq', 'fun': g5}
-con6 = {'type': 'ineq', 'fun': g6}
-con7 = {'type': 'ineq', 'fun': g7}
-cons = [con1, con2, con3, con4, con5, con6, con7]
-solution = minimize(f, x0, bounds=bs, constraints=cons)
-#print(solution)
+# Define the 11-dimentional design variable
+# e.g. let's see what happens if we only eat an egg for a meal
+X = (
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+)
+
+# Compute & print the corresponding objective function value
+print(f(X)) # 0.225 - hey that's a pretty low carbon footprint!
+
+# Compute & print the corresponding constraint values (>=0 for meeting the constraints)
+print(g1(X)) # 4.712 - aaaand it's within our budget :D
+print(g2(X), g3(X), g4(X)) # (-21.33, -74, -9.67) - looks like we're not gonna have enough of any of the macronutrient tho:(
+print(g5(X), g6(X), g7(X)) # (39.33, 107.33, 21) - well at least we're not gonna consume too much of anything
 
 """
-Test
-    X - the 11-dimentional design variable
-"""
-def test(X):
-    # Compute & print the corresponding objective function value
-    print(f(X))
-
-    # Compute & print the corresponding constraint values
-    # (g >= 0 means the constraint is met)
-
-    # Budget constraint
-    print(g1(X))
-
-    # Nutritional constraints - lower bounds
-    print(g2(X), g3(X), g4(X))
-
-    # Nutritional constraints - upper bounds (this is optional)
-    print(g5(X), g6(X), g7(X))
-
-"""
-Scipy Linear Programming
+Textbook LP problem
 """
 
-c = np.array(Y)
-neg_AP = [element * -1 for element in AP]
-neg_AC = [element * -1 for element in AC]
-neg_AF = [element * -1 for element in AF]
-A_ub = np.array([C, neg_AP, neg_AC, neg_AF, AP, AC, AF])
-b_ub = np.array([B, -NP[0], -NC[0], -NF[0], NP[1], NC[1], NF[1]])
-bounds = [(0, 3) for i in range(0, N)]
+from scipy.optimize import linprog
+c = [-2, -1]
+N = 2
+f = lambda X: sum(c[i] * X[i] for i in range(0, N))
+A_ub = [[4, 3], [2, 1], [1, 2]]
+b_ub = [12, 4, 4]
+bounds = [(0, None), (0, None)]
 res = linprog(c=c, A_ub=A_ub, b_ub=b_ub, bounds=bounds, method='simplex')
 print(res)
-print(test(res.x))
+print(f(res.x))
+print(f([2, 0]))
