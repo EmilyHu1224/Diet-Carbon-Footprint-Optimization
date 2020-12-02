@@ -5,6 +5,7 @@ Import numpy and minimize solver
 """
 import numpy as np
 from scipy.optimize import minimize
+from scipy.optimize import linprog
 
 """
 Constants
@@ -19,7 +20,7 @@ Constants
     AC - amount of carbohydrates of food items (AP1, AP2, ..., APn)
     AF - amount of fat of food items (AP1, AP2, ..., APn)
 """
-# B = 5
+#B = 5
 B = 15
 N = 11
 # NP = (27.33, 45.33)
@@ -149,27 +150,51 @@ con6 = {'type': 'ineq', 'fun': g6}
 con7 = {'type': 'ineq', 'fun': g7}
 cons = [con1, con2, con3, con4, con5, con6, con7]
 solution = minimize(f, x0, bounds=bs, constraints=cons)
-print(solution)
+#print(solution)
+
+"""
+Scipy Linear Programming
+"""
+
+c = np.array(Y)
+neg_AP = [element * -1 for element in AP]
+neg_AC = [element * -1 for element in AC]
+neg_AF = [element * -1 for element in AF]
+lincons = np.array([C, neg_AP, neg_AC, neg_AF, AP, AC, AF])
+B = np.array([B, NP[0], NC[0], NF[0], NP[1], NC[1], NF[1]])
+
+linsoln = linprog(c=c, A_ub=lincons, b_ub=B) #, A_eq=None, b_eq=None, bounds=) #, method='interior-point', callback=None, options=None, x0=None)
+#print(linsoln)
+
+print('Optimal value:', linsoln.fun,
+      '\nx values:', linsoln.x,
+      '\nNumber of iterations performed:', linsoln.nit,
+      '\nStatus:', linsoln.message)
 
 """
 Playground
 """
-def playground():
+def playground(linsoln):
     # Define the 11-dimentional design variable
     # e.g. let's see what happens if we only eat an egg for a meal
+    X = linsoln.x
+    
+    """
+    budget of $5 X values with linprog
     X = (
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        1,
+        8.62884858e-11,
+        5.13805680e-11,
+        1.95124527e-10,
+        3.20702547e-12,
+        2.68186648e-12,
+        6.92533560e-12,
+        4.04571075e-11,
+        4.98268439e-12,
+        5.85192330e-12,
+        6.43568664e-13,
+        1.17984902e-11,
     )
+    """
 
     # Compute & print the corresponding objective function value
     print(f(X)) # 0.225 - hey that's a pretty low carbon footprint!
@@ -186,4 +211,4 @@ def playground():
     # Nutritional constraints - upper bounds (this is optional)
     print(g5(X), g6(X), g7(X)) # (39.33, 107.33, 21) - well at least we're not gonna consume too much of anything
 
-# playground()
+playground(linsoln)
