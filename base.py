@@ -11,11 +11,15 @@ Constants
     AC - amount of carbohydrates of food items (AP1, AP2, ..., APn)
     AF - amount of fat of food items (AP1, AP2, ..., APn)
 """
-B = 10
+# from statistics import stdev, mean
+import statistics
+
+NUM_DAYS = 7
+B = 15 * NUM_DAYS
 N = 18
-NP = (82, 136)
-NC = (225, 325)
-NF = (44, 78)
+NP = (82 * NUM_DAYS, 136 * NUM_DAYS)
+NC = (225 * NUM_DAYS, 325 * NUM_DAYS)
+NF = (44 * NUM_DAYS, 78 * NUM_DAYS)
 Y = (
     0.0826,
     0.0522,
@@ -116,8 +120,29 @@ AF = (
     5,
     11,
 )
+# X_MIN = 1
+# X_MAX = 3 * NUM_DAYS
 X_MIN = 0
-X_MAX = 3
+X_MAX = None
+
+GROUP_RANGES = [
+    range(0, 1),
+    range(2, 6),
+    range(7, 11),
+    range(12, 13),
+    range(14, 17),
+]
+
+GROUP_MIN = 3
+
+GROUP_NAMES = [
+    'fruits',
+    'veggies',
+    'dairy',
+    'grains',
+    'meat'
+]
+
 
 NAMES = (
     'Banana',
@@ -167,7 +192,6 @@ g3 = lambda X: sum(X[i] * AC[i] for i in range(0, N)) - NC[0]
 g4 = lambda X: sum(X[i] * AF[i] for i in range(0, N)) - NF[0]
 
 """
-Optional
 Constraint #5-7: nutritional values (upper bounds)
     g = recommended amount - total amount >= 0
     e.g. g5 for protein:
@@ -177,6 +201,46 @@ Constraint #5-7: nutritional values (upper bounds)
 g5 = lambda X: NP[1] - sum(X[i] * AP[i] for i in range(0, N))
 g6 = lambda X: NC[1] - sum(X[i] * AC[i] for i in range(0, N))
 g7 = lambda X: NF[1] - sum(X[i] * AF[i] for i in range(0, N))
+
+
+"""
+Additional constraint #8-12: minimum serving per food group
+    g = total servings per group >= GROUP_MIN
+    e.g. g8 for fruits:
+        x1 + x2 >= GROUP_MIN
+"""
+g8 = lambda X: sum(X[i] for i in GROUP_RANGES[0]) - GROUP_MIN
+g9 = lambda X: sum(X[i] for i in GROUP_RANGES[1]) - GROUP_MIN
+g10 = lambda X: sum(X[i] for i in GROUP_RANGES[2]) - GROUP_MIN
+g11 = lambda X: sum(X[i] for i in GROUP_RANGES[3]) - GROUP_MIN
+g12 = lambda X: sum(X[i] for i in GROUP_RANGES[4]) - GROUP_MIN
+
+"""
+Additional constraint #13 - CV of the distribution
+    g = std(X)/mean(X) <= CV_MAX
+"""
+cv = lambda X: statistics.stdev(X) / statistics.mean(X)
+# CV_MAX = 0.4
+# g13 = lambda X: CV_MAX - cv(X)
+
+"""
+All constraints
+"""
+CONSTRAINTS = (
+    g1,
+    g2,
+    g3,
+    g4,
+    g5,
+    g6,
+    g7,
+    # g8,
+    # g9,
+    # g10,
+    # g11,
+    # g12,
+    # g13,
+)
 
 """
 Test
@@ -197,6 +261,9 @@ def test(X):
 
     # Nutritional constraints - upper bounds (this is optional)
     print(g5(X), g6(X), g7(X))
+
+    # Coefficient of variation (CV) of the results
+    print(cv(X))
 
 """
 Negate each element of an array
