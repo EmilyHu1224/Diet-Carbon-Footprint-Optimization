@@ -13,6 +13,7 @@ Constants
 """
 # from statistics import stdev, mean
 import statistics
+from scipy.optimize import LinearConstraint, NonlinearConstraint
 
 NUM_DAYS = 7
 B = 15 * NUM_DAYS
@@ -120,6 +121,8 @@ AF = (
     5,
     11,
 )
+
+# Specify an upper bound on the number of servings
 # X_MIN = 1
 # X_MAX = 3 * NUM_DAYS
 X_MIN = 0
@@ -220,8 +223,6 @@ Additional constraint #13 - CV of the distribution
     g = std(X)/mean(X) <= CV_MAX
 """
 cv = lambda X: statistics.stdev(X) / statistics.mean(X)
-# CV_MAX = 0.4
-# g13 = lambda X: CV_MAX - cv(X)
 
 """
 All constraints
@@ -241,6 +242,16 @@ CONSTRAINTS = (
     # g12,
     # g13,
 )
+
+"""
+    Define linear constraints for trust-constr method
+"""
+lc1 = LinearConstraint(C, [0], [B])
+lc2 = LinearConstraint(AP, [NP[0]], [NP[1]])
+lc3 = LinearConstraint(AC, [NC[0]], [NC[1]])
+lc4 = LinearConstraint(AF, [NF[0]], [NF[1]])
+tc_constraints = [lc1, lc2, lc3, lc4]
+
 
 """
 Test
