@@ -11,8 +11,7 @@ Constants
     AC - amount of carbohydrates of food items (AP1, AP2, ..., APn)
     AF - amount of fat of food items (AP1, AP2, ..., APn)
 """
-# from statistics import stdev, mean
-import statistics
+from statistics import stdev, mean
 from scipy.optimize import LinearConstraint, NonlinearConstraint
 
 NUM_DAYS = 7
@@ -221,8 +220,9 @@ g12 = lambda X: sum(X[i] for i in GROUP_RANGES[4]) - GROUP_MIN
 """
 Additional constraint #13 - CV of the distribution
     g = std(X)/mean(X) <= CV_MAX
+    see minimize.py for definition & confuguration
 """
-cv = lambda X: statistics.stdev(X) / statistics.mean(X)
+cv = lambda X: stdev(X) / mean(X)
 
 """
 All constraints
@@ -240,7 +240,6 @@ CONSTRAINTS = (
     # g10,
     # g11,
     # g12,
-    # g13,
 )
 
 """

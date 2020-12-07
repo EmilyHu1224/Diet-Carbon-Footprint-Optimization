@@ -22,8 +22,10 @@ for mtd in mtds:
     print('f(x):', res.fun)
     print('x:', res.x)
     print('iterations:', res.nit)
+
     # Compute the average time with timeit
     fun_str = "linprog(c=c, A_ub=A_ub, b_ub=b_ub, bounds=bounds, method=mtd)"
+
     # Run many times to reduce the effect of tasks running in parallel
     # -- this takes a minute
     elapsed_time = timeit.timeit(fun_str, number=1000, setup='from __main__ import ' + ', '.join(globals())) / 1000

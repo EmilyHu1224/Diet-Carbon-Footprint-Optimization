@@ -13,14 +13,17 @@ x0 = [1 for i in range(0, N)]
 bounds = [[X_MIN, X_MAX] for i in range(0, N)]
 options = {'maxiter': MAX_ITER}
 
+# CV = 0.1 does not converge
 lower_bound = 0.2
 upper_bound = 3
 STEP_LENGTH = 0.1
 NUM_STEPS = int(round((upper_bound - lower_bound) / STEP_LENGTH)) + 1
 
 """
-    Configure method
-    Either trust-constr or SLSQP
+Configure the optimization algorithm,
+    either trust-constr or SLSQP
+Additional constraint - CV of the distribution
+    g = std(X)/mean(X) <= CV_MAX
 """
 METHOD = 'trust-constr'
 rows = []
@@ -29,9 +32,7 @@ for i in range(0, NUM_STEPS):
     g13 = lambda X: cv_max - cv(X)
 
     if METHOD == 'trust-constr':
-        # non-linear
-        def cons_f(x):
-            return cv(x)
+        cons_f = lambda x: cv(x)
         nlc1 = NonlinearConstraint(cons_f, 0, cv_max)
         cons = tc_constraints + [nlc1]
     else:
@@ -40,8 +41,10 @@ for i in range(0, NUM_STEPS):
 
     res = minimize(f, x0, bounds=bounds, constraints=cons, options=options, method=METHOD)
     X = res.x
+
     # Compute the average time with timeit
     fun_str = "minimize(f, x0, bounds=bounds, constraints=cons, method=METHOD )"
+
     # Run many times to reduce the effect of tasks running in parallel
     # -- this takes a minute
     elapsed_time = timeit.timeit(fun_str, number=1000, setup='from __main__ import ' + ', '.join(globals())) / 1000
@@ -67,9 +70,9 @@ with open('res.csv', 'w') as csvfile:
     for row in rows:
         w.writerow(row)
 
-
 """
-    # Testing Various Minimize Methods
+Testing Various Minimize Methods
+"""
 mtds = ['SLSQP', 'trust-constr']
 for mtd in mtds:
     print('=============', mtd, '=============')
@@ -77,10 +80,11 @@ for mtd in mtds:
     print('f(x):', res.fun)
     print('x:', res.x)
     print('iterations:', res.nit)
+
     # Compute the average time with timeit
     # fun_str = "minimize(f, x0, bounds=bounds, constraints=cons, method=mtd)"
     # Run many times to reduce the effect of tasks running in parallel
     # -- this takes a minute
     elapsed_time = timeit.timeit(fun_str, number=1000, setup='from __main__ import ' + ', '.join(globals()))/1000
     print('ave. time: (s)', elapsed_time)
-"""
+
